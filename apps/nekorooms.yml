@@ -26,7 +26,7 @@
     - name: 'Adding Traefik'
       set_fact:
         pg_labels:
-          traefik.frontend.auth.forward.address: '{{gauth}}'
+          traefik.frontend.auth.basic.usersFile: '/shared/.htpasswd'
           traefik.enable: 'true'
           traefik.port: '{{intport}}'
           traefik.frontend.rule: 'Host:{{pgrole}}.{{domain.stdout}}{{tldset}}{{cname}}'
@@ -44,7 +44,8 @@
       set_fact:
         pg_volumes:
           - /var/run/docker.sock:/var/run/docker.sock:ro
-
+          - /root/usersfile:/shared/.htpasswd:ro
+          
     - name: 'Setting PG ENV'
       set_fact:
         pg_env:
