@@ -1,0 +1,58 @@
+#!/bin/bash
+#
+# Title:      McMyadmin (v2)
+# Author(s):  timekills
+# URL:        https://pgblitz.com - http://github.pgblitz.com
+# GNU:        General Public License v3.0
+################################################################################
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    # CORE (MANDATORY) DO NOT CHANGE ###########################################
+
+    - name: 'Set Known Facts'
+      set_fact:
+        pgrole: 'retrocadeweb'
+        intport: '80'
+        extport: '8087'
+        image: 'tomsik68/xampp:7'
+
+    - name: 'Including cron job'
+      include_tasks: '/opt/communityapps/apps/_core.yml'
+
+    # EXTRA FUNCTIONS REQUIRED BY THE ROLE #####################################
+
+    # LABELS #### KEEPS BOTTOM CLEAN ###########################################
+    - name: 'Adding Traefik'
+      set_fact:
+        pg_labels:
+          #traefik.frontend.auth.forward.address: '{{gauth}}'
+          traefik.enable: 'true'
+          traefik.port: '{{intport}}'
+          traefik.frontend.rule: 'Host:retrocade.gg,www.retrocade.gg'
+
+    - name: 'Setting PG ENV'
+      set_fact:
+        pg_env:
+          PUID: '1000'
+          PGID: '1000'
+
+    # MAIN SCRIPT ##############################################################
+
+    - name: 'Deploying {{pgrole}}'
+      docker_container:
+        name: '{{pgrole}}'
+        image: '{{image}}'
+        pull: yes
+        published_ports:
+          - '{{ports.stdout}}{{extport}}:{{intport}}'
+        volumes: '{{pg_volumes}}'
+        env: '{{pg_env}}'
+        restart_policy: unless-stopped
+        networks:
+          - name: plexguide
+            aliases:
+              - '{{pgrole}}'
+        state: started
+        labels: '{{pg_labels}}'
