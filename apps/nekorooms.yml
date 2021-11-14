@@ -15,7 +15,7 @@
       set_fact:
         pgrole: 'nekorooms'
         intport: '8080'
-        extport: '8087'
+        extport: '8080'
         image: 'm1k1o/neko-rooms:latest'
 
     # CORE (MANDATORY) ############################################################
@@ -51,6 +51,13 @@
         pg_env:
           PUID: '1000'
           PGID: '1000'
+          NEKO_ROOMS_EPR: '10000-50000'
+          NEKO_ROOMS_NAT1TO1: 'thelastsocial.com'
+          NEKO_ROOMS_TRAEFIK_DOMAIN: 'rabbit.thelastsocial.com'
+          NEKO_ROOMS_TRAEFIK_ENTRYPOINT: 'websecure'
+          NEKO_ROOMS_TRAEFIK_NETWORK: 'plexguide'
+          NEKO_ROOMS_TRAEFIK_CERTRESOLVER: 'lets-encrypt'
+          TZ: 'America/New_York'
 
     # MAIN DEPLOYMENT #############################################################
     - name: 'Deploying {{pgrole}}'
@@ -60,6 +67,7 @@
         pull: yes
         published_ports:
           - '{{ports.stdout}}{{extport}}:{{intport}}'
+          - '10000-50000'
         volumes: '{{pg_volumes}}'
         env: '{{pg_env}}'
         restart_policy: unless-stopped
