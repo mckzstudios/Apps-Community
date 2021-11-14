@@ -14,7 +14,7 @@
     - name: 'Set Known Facts'
       set_fact:
         pgrole: 'nekorooms'
-        intport: '80'
+        intport: '8080'
         extport: '8080'
         image: 'm1k1o/neko-rooms:latest'
 
